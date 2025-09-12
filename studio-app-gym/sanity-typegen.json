@@ -1,0 +1,6 @@
+{
+    "path": "../src/**/*.{ts,tsx,js,jsx}",
+    "schema": "schema.json",
+    "generates":"../src/lib/studio-app-gym/types.ts",
+    "overloadClientMethods": true
+}

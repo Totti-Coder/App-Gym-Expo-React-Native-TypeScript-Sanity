@@ -1,40 +1,40 @@
+// _layout.tsx
 import "../global.css";
-import { Slot, Stack, Tabs } from "expo-router";
-import AntDesign from "@expo/vector-icons/AntDesign";
+import { Slot } from "expo-router";
+import { ClerkProvider } from "@clerk/clerk-expo";
+import { tokenCache } from '@clerk/clerk-expo/token-cache';
+
+// Obtener la publishable key
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+console.log("🔧 DEBUGGING CLERK SETUP:");
+console.log("- publishableKey exists:", !!publishableKey);
+console.log("- publishableKey value:", publishableKey);
+console.log("- publishableKey length:", publishableKey?.length);
+console.log("- Starts with pk_test_:", publishableKey?.startsWith('pk_test_'));
+
+// Intentar decodificar la parte base64 para ver si es válida
+if (publishableKey) {
+  try {
+    const base64Part = publishableKey.replace('pk_test_', '');
+    const decoded = atob(base64Part.replace('$', ''));
+    console.log("- Decoded base64:", decoded);
+  } catch (e) {
+    console.log("- Base64 decode error:", e.message);
+  }
+}
+
+if (!publishableKey) {
+  throw new Error('Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in environment variables');
+}
 
 export default function Layout() {
   return (
-    <Tabs>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <AntDesign name="home" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <AntDesign name="user" color={color} size={size} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{
-          title: "History",
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <AntDesign name="clockcircle" color={color} size={size} />
-          ),
-        }}
-      />
-    </Tabs>
+    <ClerkProvider 
+      publishableKey={publishableKey}
+      tokenCache={tokenCache}
+    >
+      <Slot />
+    </ClerkProvider>
   );
 }

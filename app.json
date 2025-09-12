@@ -10,7 +10,7 @@
       [
         "expo-router",
         {
-          "origin": "https://n"
+          "origin": "http://localhost:8081"
         }
       ]
     ],
