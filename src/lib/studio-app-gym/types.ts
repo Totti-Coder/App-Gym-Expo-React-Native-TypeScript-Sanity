@@ -190,10 +190,10 @@ export type AllSanitySchemaTypes = Workout | Ejercicio | SanityImagePaletteSwatc
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ../src/app/(app)/(tabs)/exercises.tsx
 // Variable: exercisesQuery
-// Query: *[_type == "Ejercicio" && isActive == true] | order(nombre asc) {  _id,  _type,  nombre,  descripcion,  dificultad,  imagen {    asset->{      _id,      url    },    alt,    caption  },  videoUrl,  isActive,  _createdAt,  _updatedAt}
+// Query: *[_type == "Ejercicio" && isActive == true] | order(nombre asc) {  _id,  _rev,  nombre,  descripcion,  dificultad,  imagen {    asset->{      _id,      url    },    alt,    caption  },  videoUrl,  isActive,  _createdAt,  _updatedAt}
 export type ExercisesQueryResult = Array<{
   _id: string;
-  _type: "Ejercicio";
+  _rev: string;
   nombre: string | null;
   descripcion: string | null;
   dificultad: "avanzado" | "intermedio" | "principiante" | null;
@@ -211,10 +211,41 @@ export type ExercisesQueryResult = Array<{
   _updatedAt: string;
 }>;
 
+// Source: ../src/app/(app)/exercise-detail.tsx
+// Variable: singleExerciseQuery
+// Query: *[_type == "Ejercicio" && _id == $id] [0]
+export type SingleExerciseQueryResult = {
+  _id: string;
+  _type: "Ejercicio";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  nombre?: string;
+  descripcion?: string;
+  dificultad?: "avanzado" | "intermedio" | "principiante";
+  imagen?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    caption?: string;
+    _type: "image";
+  };
+  videoUrl?: string;
+  isActive?: boolean;
+} | null;
+
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "*[_type == \"Ejercicio\" && isActive == true] | order(nombre asc) {\n  _id,\n  _type,\n  nombre,\n  descripcion,\n  dificultad,\n  imagen {\n    asset->{\n      _id,\n      url\n    },\n    alt,\n    caption\n  },\n  videoUrl,\n  isActive,\n  _createdAt,\n  _updatedAt\n}": ExercisesQueryResult;
+    "*[_type == \"Ejercicio\" && isActive == true] | order(nombre asc) {\n  _id,\n  _rev,\n  nombre,\n  descripcion,\n  dificultad,\n  imagen {\n    asset->{\n      _id,\n      url\n    },\n    alt,\n    caption\n  },\n  videoUrl,\n  isActive,\n  _createdAt,\n  _updatedAt\n}": ExercisesQueryResult;
+    "*[_type == \"Ejercicio\" && _id == $id] [0]": SingleExerciseQueryResult;
   }
 }

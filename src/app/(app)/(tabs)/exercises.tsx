@@ -11,6 +11,7 @@ import ExerciseCard from '@/app/components/ExerciseCard'
 export const exercisesQuery = defineQuery(`*[_type == "Ejercicio" && isActive == true] | order(nombre asc) {
   _id,
   _rev,
+  _type,
   nombre,
   descripcion,
   dificultad,
@@ -116,7 +117,7 @@ export default function Exercises() {
       {/* Header */}
       <View className="px-6 py-4 bg-white border-b border-gray-200">
         <Text className="text-2xl font-bold text-gray-900">
-          Exercise Library
+          Libreria de Ejercicios
         </Text>
         <Text className="text-gray-600 mt-1">
           Descubre y masteriza nuevos ejercicios ({exercises.length} total)
