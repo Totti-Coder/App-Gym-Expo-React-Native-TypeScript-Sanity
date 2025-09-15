@@ -72,11 +72,13 @@ export default function ExerciseDetail() {
   }, [id]);
 
   const getAiGuidance = async () => {
+    //Si no hay ejercicio seleccionado la funcion termina
     if (!exercise) return
-
+    // Se pone en estado de carga
     setAiLoading(true)
 
     try {
+      //Se hace una llamada a la API con una peticion post
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: {
@@ -84,11 +86,14 @@ export default function ExerciseDetail() {
         },
         body: JSON.stringify({ exerciseNombre: exercise.nombre}),
       })
+      // Verifica si la respuesta fue exitosa
       if(!response.ok){
         throw new Error("Error al cargar los datos")
       }
+      //Procesa la respuesta, guarda el mensaje de la IA en el estado aiGuidance y la API devuelve un objeto (message)
       const data = await response.json()
       setAiGuidance(data.message)
+      //Manejo de errores
     } catch (error) {
       console.error("Error cargando los datos de la IA", error)
     } finally {
@@ -241,9 +246,6 @@ export default function ExerciseDetail() {
     )}
   </View>
 )}
-
-          {/* Seccion de GUIA de la IA */}
-
 
           {/* Botones */}
           <View className="mt-8 gap-2">

@@ -17,7 +17,7 @@ function Layout() {
       <Tabs.Screen
         name="exercises"
         options={{
-          title: "Exercises",
+          title: "Ejercicios",
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="book" color={color} size={size} />
@@ -27,7 +27,7 @@ function Layout() {
       <Tabs.Screen
         name="workout"
         options={{
-          title: "Workout",
+          title: "Entrenamiento",
           headerShown: false,
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="pluscircle" color={color} size={size} />
@@ -46,7 +46,7 @@ function Layout() {
         name="history"
         options={{
           headerShown: false,
-          title: "History",
+          title: "Historial",
           tabBarIcon: ({ color, size }) => (
             <AntDesign name="book" color={color} size={size} />
           ),
@@ -56,7 +56,7 @@ function Layout() {
         name="profile"
         options={{
           headerShown: false,
-          title: "Profile",
+          title: "Perfil",
         //tabBarIcon: ({ color, size }) => (
             //<AntDesign name="home" color={color} size={size} />
          // ),

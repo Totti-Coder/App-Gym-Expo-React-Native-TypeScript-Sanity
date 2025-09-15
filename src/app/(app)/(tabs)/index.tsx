@@ -25,12 +25,11 @@ function Content() {
             </Text>
 
             <Text className="mx-auto max-w-[700px] text-lg text-center md:text-xl">
-              This template sets up Expo and Tailwind (NativeWind) allowing you
-              to quickly get started with my YouTube tutorial!
+              
             </Text>
             <Link href="https://www.youtube.com/@sonnysangha" target="_blank">
               <Text className="text-lg text-center text-blue-500 hover:text-blue-700 underline md:text-xl dark:text-blue-400 dark:hover:text-blue-300">
-                https://www.youtube.com/@sonnysangha
+                
               </Text>
             </Link>
 
@@ -50,7 +49,7 @@ function Content() {
                 className="flex h-9 items-center justify-center overflow-hidden rounded-md bg-red-700 px-4 py-2 text-sm font-medium text-gray-50 web:shadow ios:shadow transition-colors hover:bg-gray-900/90 active:bg-gray-400/90 web:focus-visible:outline-none web:focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50 dark:bg-gray-50 dark:text-gray-900 dark:hover:bg-gray-50/90 dark:focus-visible:ring-gray-300"
                 href="https://www.papareact.com/course"
               >
-                Get the Complete Source Code (Plus 60+ builds) ❤️
+                
               </Link>
             </View>
 
