@@ -1,5 +1,5 @@
 import { OpenAI } from "openai"
-import exercise from "studio-app-gym/schemaTypes/exercise"
+
 
 const openai= new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
