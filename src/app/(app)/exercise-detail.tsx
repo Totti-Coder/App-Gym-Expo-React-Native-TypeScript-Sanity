@@ -55,6 +55,7 @@ export default function ExerciseDetail() {
   const [aiGuidance, setAiGuidance] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
 
+  //Funcion que se ejecuta cuando el componente se monta, obtiene los datos de sanity en funcion del ID y actualiza exercise con los datos obtenidos
   useEffect(() => {
     const fetchExercise = async () => {
       if (!id) return;

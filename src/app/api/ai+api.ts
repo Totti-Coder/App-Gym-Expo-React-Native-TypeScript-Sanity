@@ -1,12 +1,12 @@
 import { OpenAI } from "openai"
 
-
+//Instancia del cliente OpenAI
 const openai= new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 })
 
 
-
+// Funcion Api Route de Expo Router
 export async function POST(request: Request) {
     const {exerciseNombre} = await request.json()
 
@@ -18,6 +18,7 @@ export async function POST(request: Request) {
         )
     }
 
+    //Instrucciones para la IA
     const prompt = `
     Eres un entrenador personal.
 
@@ -52,7 +53,9 @@ export async function POST(request: Request) {
         })
 
         console.log(response)
+        //Exito
         return Response.json({message: response.choices[0].message.content})
+        //Error
     } catch (error){
         console.error("Error cargando los datos de la guia IA", error)
         return Response.json(
