@@ -7,6 +7,7 @@ import {
   ScrollView,
   Image,
   Linking,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { router, useLocalSearchParams, useRouter } from "expo-router";
@@ -67,6 +68,43 @@ export default function ExerciseDetail() {
     };
     fetchExercise();
   }, [id]);
+
+  const getAiGuidance = async () => {
+    if (!exercise) return
+
+    setAiLoading(true)
+
+    try {
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ exerciseNombre: exercise.nombre}),
+      })
+      if(!response.ok){
+        throw new Error("Error al cargar los datos")
+      }
+      const data = await response.json()
+      setAiGuidance(data.message)
+    } catch (error) {
+      console.error("Error cargando los datos de la IA", error)
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
+  //Funcion de cargado de ejercicios
+  if (loading){
+    return (
+      <SafeAreaView className="flex-1 bg-white">
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#0000ff"/>
+          <Text className="text-gray-500">Cargando ejercicio...</Text>
+        </View>
+      </SafeAreaView>
+    )
+  }
   return (
     <SafeAreaView className="flex-1 bg-white">
       <StatusBar barStyle="light-content" backgroundColor="white" />
@@ -154,6 +192,56 @@ export default function ExerciseDetail() {
               </TouchableOpacity>
             </View>
           )}
+
+          {/* Seccion de GUIA de la IA */}
+          {(aiGuidance || aiLoading) && (
+            <View className="mb-6">
+              <View className="flex-row items-center mb-3">
+              <Ionicons name="fitness" size={24} color="#3B82F6"/>
+              <Text className="text-xl font-semibold text-gray-800 ml-2">
+                El entrenador IA dice...
+              </Text>
+              </View>
+              </View>
+          )}
+
+          {/* Seccion de GUIA de la IA */}
+
+
+          {/* Botones */}
+          <View className="mt-8 gap-2">
+            {/* Boton de coach IA */}
+            <TouchableOpacity
+            className={`rounded-xl py-4 items-center ${aiLoading
+              ? "bg-gray-400"
+              : aiGuidance
+              ? "bg-green-500"
+              : "bg-blue-500"
+            }`}
+            onPress={getAiGuidance}
+            disabled={aiLoading}
+            >
+              {aiLoading ? (
+                <View className="flex-row items-center">
+                  <ActivityIndicator size="small" color="white"/>
+                  <Text className="text-white font-bold text-lg ml-2">
+                    Cargando...
+                  </Text>
+                </View>
+              ):(
+                <Text className="text-white font-bold text-lg">
+                  {aiGuidance
+                  ? "Recarga la guia de inteligencia artificial"
+                : "Utiliza esta IA para aprender la tecnica y forma"}
+                </Text>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity
+            className="bg-gray-200 rounded-xl py-4 items-center"
+            onPress={() => router.back()}>
+              <Text className="text-gray-800 font-bold text-lg">Cierre</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

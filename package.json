@@ -26,6 +26,7 @@
     "expo-status-bar": "~2.2.3",
     "groq": "^4.8.1",
     "nativewind": "^4.0.1",
+    "openai": "^5.20.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.4",
