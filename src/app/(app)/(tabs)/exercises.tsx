@@ -6,11 +6,13 @@ import {defineQuery} from "groq"
 import { client } from '@/lib/studio-app-gym/client'
 import { Ejercicio } from 'studio-app-gym/sanity.types'
 import ExerciseCard from '@/app/components/ExerciseCard'
+import exercise from 'studio-app-gym/schemaTypes/exercise'
 
 // Define the query outside the component for proper type generation
 export const exercisesQuery = defineQuery(`*[_type == "Ejercicio" && isActive == true] | order(nombre asc) {
   _id,
   _rev,
+  _type,
   nombre,
   descripcion,
   dificultad,
