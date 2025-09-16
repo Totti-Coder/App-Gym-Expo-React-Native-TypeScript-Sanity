@@ -165,25 +165,25 @@ const { volume, unit } = getTotalVolume()
             ) : (
               <>
               <Ionicons name="trash-bin-outline" size={16} color="#FFFFFF"/>
-              <Text className="text-white font-medium ml-2">Borrar</Text>
+              <Text className="text-white font-medium ml-2"> Borrar </Text>
               </>
-            )
-          })
+            )}
           </TouchableOpacity>
         </View>
+        {/* La fecha del entrenamiento */}
         <View className="flex-row items-center mb-3">
           <Ionicons name="calendar-outline" size={20} color="#6B7280"/>
           <Text className="text-gray-700 ml-3 font-medium">
             {formatDate(workout.date)} a las {formatTime(workout.date)}
           </Text>
         </View>
-
+          {/* La duracion del entrenamiento */}
           <View className="flex-row items-center mb-3">
-          <Ionicons name="calendar-outline" size={20} color="#6B7280"/>
+          <Ionicons name="time-outline" size={20} color="#6B7280"/>
           <Text className="text-gray-700 ml-3 font-medium">
             {formatDuration(workout.durationInSeconds)}
           </Text>
-
+          {/* Los ejercicios realizados */}
         </View>
         <View className="flex-row items-center mb-3">
           <Ionicons name="fitness-outline" size={20} color="#6B7280"/>
@@ -191,14 +191,14 @@ const { volume, unit } = getTotalVolume()
             {workout.exercises?.length || 0} Ejercicios
           </Text>
         </View>
-
+          {/* El numero de sets hechos */}
         <View className="flex-row items-center mb-3">
           <Ionicons name="bar-chart-outline" size={20} color="#6B7280"/>
           <Text className="text-gray-700 ml-3 font-medium">
             {getTotalSets()} series totales
           </Text>
         </View>
-        
+        {/* El volumen de entreno */}
         {volume > 0 && (
           <View className="flex-row items-center mb-3">
           <Ionicons name="barbell-outline" size={20} color="#6B7280"/>
@@ -208,8 +208,32 @@ const { volume, unit } = getTotalVolume()
         </View>
         )}
         </View>
+
+        {/* Lista de Ejercicios */}
+        <View className="space-y-4 p-6 gap-4">
+          {workout.exercises?.map((exerciseData, index) => {
+            return <View key={exerciseData._key}
+            className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              {/* El encabezado de los Ejercicios */}
+              <View className="flex-row items-center justify-between mb-3">
+                <View className="flex-1">
+                  <Text className="text-lg font-bold text-gray-900">
+                    {exerciseData.exercise?.nombre || "Ejercicio Desconocido"}
+                  </Text>
+                  <Text className="text-gray-600 text-sm mt-1">
+                    {exerciseData.sets?.length || 0} sets completados
+                  </Text>
+                  </View>
+                  <View className="bg-blue-100 rounded-2xl w-8 h-8 items-center justify-center">
+                    <Text className="text-blue-600 font-bold">{index+1}</Text>
+                  </View>
+                </View>
+              
+            </View>
+          })}
+        </View>
+        
         </ScrollView>
     </SafeAreaView>
   )
 }
-
