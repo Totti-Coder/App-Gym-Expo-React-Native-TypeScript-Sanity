@@ -1,11 +1,13 @@
-import { Text, View, StatusBar, Platform, TouchableOpacity, Alert } from "react-native"
-import React from "react"
+import { Text, View, StatusBar, Platform, TouchableOpacity, Alert, KeyboardAvoidingView, ScrollView } from "react-native"
+import React, { useState } from "react"
 import { useWorkoutStore } from "store/workout-store"
-import { useFocusEffect, useRouter } from "expo-router"
 import { useStopwatch } from "react-timer-hook"
 import { Ionicons } from "@expo/vector-icons"
+import ExerciseSelectionModal from "@/app/components/ExerciseSelectionModal"
+import { useRouter } from "expo-router"
 
 export default function ActiveWorkout() {
+  const [showExerciseSelection, setShowExerciseSelection] = useState(false)
   const {
     workoutExercises,
     setWorkoutExercises,
@@ -19,7 +21,7 @@ export default function ActiveWorkout() {
   const { seconds, minutes, hours, reset } = useStopwatch({ autoStart: true })
 
   const getWorkoutDuration = () => {
-    return `${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+    return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
   }
 
   
@@ -56,6 +58,10 @@ const cancelWorkout = () => {
   }
 }
 
+
+const addExercise = () => {
+  setShowExerciseSelection(true)
+}
 
   return (
     <View className="flex-1">
@@ -143,7 +149,45 @@ const cancelWorkout = () => {
               </Text>
               </View>
           )}
+
+          {/* Todos los ejercicios*/}
+          <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          className="flex-1">
+            <ScrollView className="flex-1 px-6 mt-4">
+              {workoutExercises.map((exercise) => (
+                <View key={exercise.id} className="mb-8">
+                  {/* Encabezado del Ejercicio */}
+                </View>
+              ))}
+
+              {/* Boton de agregar ejercicios*/}
+              <TouchableOpacity
+              onPress={addExercise}
+              className="bg-blue-600 rounded-2xl py-4 items-center mb-8 active:bg-blue-700"
+              activeOpacity={0.8}
+              >
+                <View className="flex-row items-center">
+                  <Ionicons
+                  name="add"
+                  size={20}
+                  color="white"
+                  style={{marginRight: 8}}
+                  />
+                  <Text className="text-white font-semibold text-lg">
+                    Añade un ejercicio
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            </ScrollView>
+          </KeyboardAvoidingView>
         </View>
+
+        <ExerciseSelectionModal
+        visible={showExerciseSelection}
+        onClose={() => setShowExerciseSelection(false)}>
+        
+        </ExerciseSelectionModal>
     </View>
   )
 }
