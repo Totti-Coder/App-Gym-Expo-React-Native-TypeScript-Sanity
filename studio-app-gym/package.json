@@ -16,10 +16,10 @@
     "sanity"
   ],
   "dependencies": {
-    "@sanity/vision": "^4.8.1",
+    "@sanity/vision": "^4.9.0",
     "react": "^19.1",
     "react-dom": "^19.1",
-    "sanity": "^4.8.1",
+    "sanity": "^4.9.0",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {
