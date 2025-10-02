@@ -44,6 +44,7 @@ export const useWorkoutStore = create<WorkoutStore>((set) => ({
   }),
   
   setWorkoutExercises: (exercises) =>
+    // set es la funcion para actualizar el estado
     set((state) => ({
       workoutExercises:
         typeof exercises === "function"

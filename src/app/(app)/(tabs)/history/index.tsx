@@ -12,6 +12,7 @@ import {
   RefreshControl,
   SafeAreaView,
   ScrollView,
+  StatusBar,
   Text,
   TouchableOpacity,
   View,
@@ -102,7 +103,7 @@ export default function HistoryPage() {
   };
 
   const formatWorkoutDuration = (seconds?: number) => {
-    if (!seconds) return "Esta duracion no esta recogida";
+     if (typeof seconds !== 'number') return "Duración no disponible";
     return formatDuration(seconds);
   };
 
@@ -132,6 +133,7 @@ const getTotalSets = (workout: GetWorkoutsQueryResult[number]) => {
   }
   return (
     <SafeAreaView className="flex-1 bg-white">
+    <StatusBar barStyle="dark-content" backgroundColor="white" />
       {/* Encabezado / Header */}
       <View className="px-6 py-4 bg-white border-b border-gray-200">
         <Text className="text-2xl font-bold text-gray-900">

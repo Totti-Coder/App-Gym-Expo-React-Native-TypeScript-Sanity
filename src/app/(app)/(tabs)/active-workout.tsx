@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
 import { useWorkoutStore, WorkoutSet } from "store/workout-store";
@@ -16,10 +17,21 @@ import { useStopwatch } from "react-timer-hook";
 import { Ionicons } from "@expo/vector-icons";
 import ExerciseSelectionModal from "@/app/components/ExerciseSelectionModal";
 import { useRouter } from "expo-router";
+import { client } from "@/lib/studio-app-gym/client";
+import { defineQuery } from "groq";
+import { useUser } from "@clerk/clerk-expo";
+import { WorkoutData } from "@/app/api/save-workout+api";
 
+
+const findExerciseQuery = defineQuery(`*[_type == "Ejercicio" && _id == $id][0] {
+  _id,
+  nombre
+}`);
 
 export default function ActiveWorkout() {
+  const {user} = useUser()
   const [showExerciseSelection, setShowExerciseSelection] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const {
     workoutExercises,
     setWorkoutExercises,
@@ -32,12 +44,145 @@ export default function ActiveWorkout() {
 
   // Cronometro automatico
   const { seconds, minutes, hours, reset } = useStopwatch({ autoStart: true });
+  const totalSeconds = hours * 3600 + minutes * 60 + seconds;
 
   // Formateo del tiempo
   const getWorkoutDuration = () => {
     return `${hours.toString().padStart(2, "0")}:${minutes
       .toString()
       .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+  };
+  // Funcion para completar definitivamente el entrenamiento y que se guarde adecuadamente
+  const endWorkout = async () => {
+    const saved = await saveWorkoutToDatabase();
+    if (saved) {
+      if (Platform.OS === "web") {
+        alert(
+          "Entrenamiento Guardado\n\nTu entrenamiento se ha guardado adecuadamente"
+        );
+      } else {
+        Alert.alert(
+          "Entrenamiento Guardado",
+          "Tu entrenamiento se ha guardado adecuadamente"
+        );
+      }
+      resetWorkout();
+      router.replace("/(app)/(tabs)/history?refresh=true");
+    }
+  };
+
+  const saveWorkoutToDatabase = async () => {
+    // Verifica si ya se ha guardado el entrenamiento para evitar que se realice el mismo proceso multiples veces
+    if (isSaving) return false;
+    setIsSaving(true);
+
+    try {
+      // Implemento el guardado IMPORTANTE
+      // Utilizo el stopwatch para saber el total de segundos que duro el entrenamiento
+      const durationInSeconds = totalSeconds;
+      // TRANSFORMAR LOS DATOS DE LOS EJERCICIOS PARA QUE COINCIDAN CON EL ESQUEMA DE SANITY
+      const exercisesForSanity = await Promise.all(
+        workoutExercises.map(async (exercise) => {
+          // Busca el ejercicio en el documento de Sanity por el nombre
+          const exerciseDoc = await client.fetch(findExerciseQuery, {
+            id: exercise.sanityId,
+          });
+          if (!exerciseDoc) {
+            throw new Error(
+              `El ejercicio "${exercise.sanityId}" no se ha encontrado en la base de datos`
+            );
+          }
+
+          const setsForSanity = exercise.sets
+            .filter((set) => set.isCompleted && set.reps && set.weight)
+            .map((set) => ({
+              _type: "setLog",
+              _key: Math.random().toString(36).substr(2, 9),
+              reps: parseInt(set.reps, 10) || 0,
+              weight: parseFloat(set.weight) || 0,
+              weightUnit: set.weightUnit,
+            }));
+
+          return {
+            _type: "exerciseLog",
+            _key: Math.random().toString(36).substr(2, 9),
+            exercise: {
+              _type: "reference",
+              _ref: exercise.sanityId,
+            },
+            sets: setsForSanity,
+          };
+        })
+      );
+
+      // Filtrar ejercicios que tengan series sin completar
+      const validExercises = exercisesForSanity.filter(
+        (exercise) => exercise.sets.length > 0
+      );
+      if (validExercises.length === 0) {
+        if (Platform.OS === "web") {
+          alert(
+            "Tiene series sin completar\n\nPor favor completa al menos una serie para guardar el entreno"
+          );
+        } else {
+          Alert.alert(
+            "Tiene series sin completar",
+            "Por favor completa al menos una serie para guardar el entreno"
+          );
+        }
+        return false;
+      }
+
+      // Creacion del documento del entrenamiento
+      const workoutData: WorkoutData = {
+        _type: "workout",
+        userId: user.id,
+        date: new Date().toISOString(),
+        durationInSeconds: durationInSeconds,
+        exercises: validExercises
+      }
+
+      // Hacemos una llamada al servidor de Sanity
+      const result = await fetch("/api/save-workout",{
+        method: "POST",
+        headers: { 
+        "Content-Type": "application/json",
+    },
+        body: JSON.stringify({workoutData})
+      })
+      console.log("Se ha guardado el entrenamiento:", result)
+
+    } catch (error) {
+      console.error("Error guardando el entrenamiento:", error);
+      Alert.alert("Guardado fallido", "Vuelve a intentarlo de nuevo");
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Funcion para guardar el entrenamiento
+  const saveWorkout = () => {
+    // Para Web
+    if (Platform.OS === "web") {
+      const confirmed = confirm(
+        "Entrenamiento Completado\n\n¿Estás seguro de que quieres finalizar el entrenamiento?"
+      );
+      if (confirmed) {
+        endWorkout();
+        router.replace("/(app)/(tabs)/history?refresh=true")
+      }
+    } else {
+      // Para Android
+      Alert.alert(
+        "Entrenamiento Completado",
+        "¿Estás seguro de que quieres finalizar el entrenamiento?",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Complete", onPress: async () => await endWorkout() },
+        ]
+      );
+    }
   };
 
   // Cancela el entrenamiento
@@ -81,8 +226,12 @@ export default function ActiveWorkout() {
     setShowExerciseSelection(true);
   };
 
-  // Para eliminar un ejercicio
-  const deleteExercise = (id: string) => {};
+  // Para eliminar un ejercicio - recibe el exerciseId y luego muestra un array con los ejercicios menos el del Id que borraste
+  const deleteExercise = (exerciseId: string) => {
+    setWorkoutExercises((exercises) =>
+      exercises.filter((exercise) => exercise.id !== exerciseId)
+    );
+  };
 
   // Para agregar una nueva serie
   const addNewSet = (exerciseId: string) => {
@@ -99,6 +248,23 @@ export default function ActiveWorkout() {
         exercise.id === exerciseId
           ? { ...exercise, sets: [...exercise.sets, newSet] }
           : exercise
+      )
+    );
+  };
+  // Funcion para eliminar la serie
+  const deleteSet = (exerciseId: string, setId: string) => {
+    //Recorre los ejercicios
+    setWorkoutExercises((exercises) =>
+      exercises.map((exercise) =>
+        // Es el ejercicio que busco?
+        exercise.id === exerciseId
+          ? // Si lo es crea un nuevo array con las series que no se han borrado
+            {
+              ...exercise,
+              sets: exercise.sets.filter((set) => set.id !== setId),
+            }
+          : // Si no, deja el ejercicio como estaba.
+            exercise
       )
     );
   };
@@ -363,6 +529,13 @@ export default function ActiveWorkout() {
                               color={set.isCompleted ? "white" : "#9CA3AF"}
                             />
                           </TouchableOpacity>
+                          {/* Boton de completado */}
+                          <TouchableOpacity
+                            onPress={() => deleteSet(exercise.id, set.id)}
+                            className="w-12 h-12 rounded-xl items-center justify-center bg-red-500 ml-1"
+                          >
+                            <Ionicons name="trash" size={16} color="white" />
+                          </TouchableOpacity>
                         </View>
                       </View>
                     ))
@@ -406,6 +579,39 @@ export default function ActiveWorkout() {
                   Añade un ejercicio
                 </Text>
               </View>
+            </TouchableOpacity>
+            {/* Boton de completar el entrenamiento */}
+            <TouchableOpacity
+              onPress={saveWorkout}
+              className={`rounded-2xl py-4 items-center mb-8 ${
+                isSaving ||
+                workoutExercises.length === 0 ||
+                workoutExercises.some((exercise) =>
+                  exercise.sets.some((set) => !set.isCompleted)
+                )
+                  ? "bg-gray-400"
+                  : "bg-green-600 active:bg-green-700"
+              }`}
+              disabled={
+                isSaving ||
+                workoutExercises.length === 0 ||
+                workoutExercises.some((exercise) =>
+                  exercise.sets.some((set) => !set.isCompleted)
+                )
+              }
+            >
+              {isSaving ? (
+                <View className="flex-row items-center">
+                  <ActivityIndicator size="small" color="white" />
+                  <Text className="text-white font-semibold text-lg ml-2">
+                    Guardando...
+                  </Text>
+                </View>
+              ) : (
+                <Text className="text-white font-semibold text-lg">
+                  Entrenamiento Completado
+                </Text>
+              )}
             </TouchableOpacity>
           </ScrollView>
         </KeyboardAvoidingView>
