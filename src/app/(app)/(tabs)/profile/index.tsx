@@ -5,30 +5,8 @@ import { Image } from "react-native";
 import { useEffect, useState } from "react";
 import { GetWorkoutsQueryResult } from "@/lib/studio-app-gym/types";
 import { client } from "@/lib/studio-app-gym/client";
-import { defineQuery } from "groq";
-import { router } from "expo-router";
+import { getWorkoutsQuery } from "../history";
 
-export const getWorkoutsQuery = defineQuery(`
-  *[_type == "workout" && userId == $userId] | order(date desc) {
-    _id,
-    date,
-    durationInSeconds,
-    exercises[] {
-    exercise->{
-        _id,
-        nombre
-        },
-      sets[] {
-        reps,
-        weight,
-        weightUnit,
-        _type,
-        _key,
-      },
-        _type,
-        _key
-    }
-  }`);
 
 export default function ProfilePage() {
   const { signOut } = useAuth();
@@ -159,6 +137,58 @@ export default function ProfilePage() {
             <StatItem value={Math.ceil(totalDuration / 60)} label="Min. Totales" valueColor="text-green-500" />
             <StatItem value={Math.ceil(averageDuration / 60)} label="Min. Promedio" valueColor="text-purple-600"/>
         </View>
+      </View>
+
+      {/* Nombre y Correo */}
+      <View className="px-6 mb-6">
+        <Text className="text-lg font-bold text-gray-900 mb-4">
+          Configuraciones
+        </Text>
+
+
+        {/* Configuraciones de la cuenta */}
+        <View className="bg-white rounded-2xl shadow-sm border border-gray-100">
+          <TouchableOpacity className="flex-row items-center justify-between p-4 border-b border-gray-100">
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-blue-100 rounded-full items-center justify-center mr-3">
+                <Ionicons name="person-outline" size={20} color="#3B82F6"/>
+              </View>
+              <Text className="text-gray-900 font-medium">Edita tu perfil</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#6B7280"/>
+          </TouchableOpacity>
+
+          <TouchableOpacity className="flex-row items-center justify-between p-4 border-b border-gray-100">
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-green-100 rounded-full items-center justify-center mr-3">
+                <Ionicons name="notifications-outline" size={20} color="#10b981"/>
+              </View>
+              <Text className="text-gray-900 font-medium">Notificaciones</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#6B7280"/>
+          </TouchableOpacity>
+
+          <TouchableOpacity className="flex-row items-center justify-between p-4 border-b border-gray-100">
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-purple-100 rounded-full items-center justify-center mr-3">
+                <Ionicons name="settings-outline" size={20} color="#8B5CF6"/>
+              </View>
+              <Text className="text-gray-900 font-medium">Preferencias</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#6B7280"/>
+          </TouchableOpacity>
+
+          <TouchableOpacity className="flex-row items-center justify-between p-4 border-b border-gray-100">
+            <View className="flex-row items-center">
+              <View className="w-10 h-10 bg-orange-100 rounded-full items-center justify-center mr-3">
+                <Ionicons name="help-circle-outline" size={20} color="#F59E0B"/>
+              </View>
+              <Text className="text-gray-900 font-medium">Ayuda & Soporte Tecnico</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="#6B7280"/>
+          </TouchableOpacity>
+        </View>
+        
       </View>
       
 
