@@ -1,9 +1,79 @@
-import { useAuth } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 import { Ionicons } from "@expo/vector-icons";
-import { Alert, SafeAreaView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, SafeAreaView, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image } from "react-native";
+import { useEffect, useState } from "react";
+import { GetWorkoutsQueryResult } from "@/lib/studio-app-gym/types";
+import { client } from "@/lib/studio-app-gym/client";
+import { defineQuery } from "groq";
+import { router } from "expo-router";
+
+export const getWorkoutsQuery = defineQuery(`
+  *[_type == "workout" && userId == $userId] | order(date desc) {
+    _id,
+    date,
+    durationInSeconds,
+    exercises[] {
+    exercise->{
+        _id,
+        nombre
+        },
+      sets[] {
+        reps,
+        weight,
+        weightUnit,
+        _type,
+        _key,
+      },
+        _type,
+        _key
+    }
+  }`);
 
 export default function ProfilePage() {
   const { signOut } = useAuth();
+  const [workouts, setWorkouts] = useState<GetWorkoutsQueryResult>([])
+  const [loading, setLoading] = useState(true)
+  const { user } = useUser() // Obtenemos el objeto user de Clerk
+
+  const fetchWorkouts = async () => {
+    if(!user?.id) return
+
+    try{
+      const results = await client.fetch(getWorkoutsQuery, {userId: user.id})
+      setWorkouts(results)
+    } catch (error) {
+      console.error("Error cargando los entrenamientos:", error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchWorkouts()
+  }, [user?.id])
+
+  // Calculo de estadisticas (Se mantiene sin cambios)
+  const totalWorkouts = workouts.length
+  const totalDuration = workouts.reduce(
+    (sum, workout) => sum + (workout.durationInSeconds || 0),
+    0
+  )
+  const averageDuration = totalWorkouts > 0 ? Math.round(totalDuration / totalWorkouts) : 0
+
+
+  // Calculo de los dias desde que empezo el usuario
+  const joinDate = user?.createdAt ? new Date(user.createdAt) : new Date()
+  const daysSinceJoining = Math.floor(
+    // Fecha actual en milisegundos menos la fecha de registro del usuario en milisegundos y luego se divide entre los milisegundos de un dia
+    (new Date().getTime() - joinDate.getTime()) / 86400000)
+
+  const formatJoinDate = (date: Date) => {
+    return date.toLocaleDateString("es-ES", {
+      month: "long",
+      year: "numeric"
+    })
+  }
 
   const handleSignOut = async () => {
     try {
@@ -13,12 +83,110 @@ export default function ProfilePage() {
       console.error("Error cerrando sesión:", error);
       Alert.alert("Error", "No se pudo cerrar sesión. Intenta de nuevo.");
     }
-    
   };
+
+  if (loading){
+    return (
+      <SafeAreaView className="flex-1 bg-gray-100">
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#3B82F6"/>
+          <Text className="text-gray-500 mt-4">Cargando el perfil...</Text>
+        </View>
+      </SafeAreaView>
+    )
+  }
   
   return (
     <SafeAreaView className="flex flex-1">
-      <Text>Profile</Text>
+      <ScrollView>
+      {/* Encabezado */}
+      <View className="px-6 pt-8 pb-6">
+        <Text className="text-2xl font-bold text-gray-900">Mi Perfil</Text>
+        <Text className="text-base text-gray-600 mt-1">
+          Controla tu cuenta y tus estadisticas
+        </Text>
+      </View>
+
+      {/* Informacion del usuario*/}
+      <View className="px-6 mb-6">
+        <View className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          
+          <View className="flex-row items-center mb-4">
+            {/* Imagen de perfil */}
+            <View className="w-16 h-16 rounded-full items-center justify-center mr-4">
+              <Image
+              source={{
+                uri: user?.externalAccounts[0]?.imageUrl ?? user?.imageUrl,
+              }}
+              className="rounded-full"
+              style={{ width: 64, height: 64}}/>
+            </View>
+            
+            {/* Nombre y Correo */}
+            <View className="flex-1">
+                <Text className="text-lg font-bold text-gray-900">
+                    {user?.fullName || user?.firstName || "Usuario"}
+                </Text>
+                <Text className="text-sm text-gray-500">
+                    {user?.emailAddresses[0]?.emailAddress}
+                </Text>
+            </View>
+          </View>
+
+          {/* Fecha de Registro y Días activo */}
+          <View className="pt-3 border-t border-gray-100 mt-4">
+              <Text className="text-sm font-semibold text-gray-700 mb-1">
+                  Miembro desde:
+              </Text>
+              <Text className="text-lg font-bold text-blue-600">
+                  {formatJoinDate(joinDate)}
+              </Text>
+              <Text className="text-sm text-gray-500 mt-1">
+                  {`Llevas ${daysSinceJoining} días activo en la aplicación.`}
+              </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Estadísticas (Puedes añadir esta sección si quieres mostrar el resto de cálculos) */}
+      <View className="px-6 mb-6">
+        <Text className="text-lg font-bold text-gray-900 mb-4">Tus Estadísticas</Text>
+        <View className="flex-row justify-between bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+            <StatItem value={totalWorkouts} label="Entrenamientos" valueColor="text-blue-600"/>
+            <StatItem value={Math.ceil(totalDuration / 60)} label="Min. Totales" valueColor="text-green-500" />
+            <StatItem value={Math.ceil(averageDuration / 60)} label="Min. Promedio" valueColor="text-purple-600"/>
+        </View>
+      </View>
+      
+
+      <View className="px-6 mb-6">
+        <Text className="text-lg font-bold text-gray-900 mb-4">Links</Text>
+        {/* Boton de empezar tu entrenamiento */}
+        <TouchableOpacity
+        onPress={() => router.push("/active-workout")}
+        className="bg-blue-700 rounded-2xl p-6 mb-4 shadow-sm"
+        activeOpacity={0.8}>
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center flex-1">
+              <View className="w-10 h-10 bg-blue-400 rounded-full items-center justify-center mr-4">
+                <Ionicons name="play" size={20} color="white"/>
+              </View>
+              <View>
+                <Text className="text-white text-xl font-semibold">
+                  Empieza tu entrenamiento
+                </Text>
+                <Text className="text-blue-200">
+                  Empieza a entrenar aqui!
+                </Text>
+              </View>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color="white"/>
+          </View>
+        </TouchableOpacity>
+      
+        
+      </View>
+
 
       <View className="px-6 mb-8">
         <TouchableOpacity
@@ -31,9 +199,19 @@ export default function ProfilePage() {
             <Text className="text-white font-semibold text-lg ml-2">
               Cerrar Sesion
             </Text>
-          </View>  
+          </View>
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
+
+// Componente auxiliar para mostrar las estadísticas de forma ordenada
+const StatItem = ({ value, label, valueColor }: { value: number; label: string; valueColor: string }) => (
+    <View className="items-center w-1/3">
+        {/* Usamos el color pasado por prop */}
+        <Text className={`text-2xl font-bold ${valueColor}`}>{value}</Text>
+        <Text className="text-sm text-gray-500">{label}</Text>
+    </View>
+);

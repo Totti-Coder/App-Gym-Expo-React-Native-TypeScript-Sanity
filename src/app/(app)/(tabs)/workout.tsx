@@ -55,7 +55,7 @@ function Workout() {
         {/* Botón de comienzo dentro de la tarjeta */}
         <TouchableOpacity
           onPress={startWorkout}
-          className="bg-blue-600 rounded-2xl py-2 items-center active:bg-blue-700"
+          className="bg-blue-500 rounded-2xl py-3 items-center active:bg-blue-600"
           activeOpacity={0.9}
         >
           <View className="flex-row items-center">

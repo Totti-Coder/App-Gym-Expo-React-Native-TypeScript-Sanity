@@ -190,8 +190,11 @@ export type AllSanitySchemaTypes = Workout | Ejercicio | SanityImagePaletteSwatc
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ../src/app/(app)/(tabs)/active-workout.tsx
 // Variable: findExerciseQuery
-// Query: *[_type == "exercise" && lower(nombre) == lower($nombre)][0] {    _id,    nombre  }
-export type FindExerciseQueryResult = null;
+// Query: *[_type == "Ejercicio" && _id == $id][0] {  _id,  nombre}
+export type FindExerciseQueryResult = {
+  _id: string;
+  nombre: string | null;
+} | null;
 
 // Source: ../src/app/(app)/(tabs)/exercises.tsx
 // Variable: exercisesQuery
@@ -301,7 +304,7 @@ export type SingleExerciseQueryResult = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    "\n  *[_type == \"exercise\" && lower(nombre) == lower($nombre)][0] {\n    _id,\n    nombre\n  }\n": FindExerciseQueryResult;
+    "*[_type == \"Ejercicio\" && _id == $id][0] {\n  _id,\n  nombre\n}": FindExerciseQueryResult;
     "*[_type == \"Ejercicio\" && isActive == true] | order(nombre asc) {\n  _id,\n  _rev,\n  _type,\n  nombre,\n  descripcion,\n  dificultad,\n  imagen {\n  _type,\n    asset->{\n      _id,\n      url\n    },\n    alt,\n    caption\n  },\n  videoUrl,\n  isActive,\n  _createdAt,\n  _updatedAt\n}": ExercisesQueryResult;
     "\n  *[_type == \"workout\" && userId == $userId] | order(date desc) {\n    _id,\n    date,\n    durationInSeconds,\n    exercises[] {\n    exercise->{\n        _id,\n        nombre\n        },\n      sets[] {\n        reps,\n        weight,\n        weightUnit,\n        _type,\n        _key,\n      },\n        _type,\n        _key\n    }\n  }": GetWorkoutsQueryResult;
     "\n  *[_type == \"workout\" && _id == $workoutId] [0] {\n    _id,\n    date,\n    durationInSeconds,\n    exercises[] {\n      exercise->{\n        _id,\n        nombre,\n        descripcion\n      },\n      sets[] {\n        reps,\n        weight,\n        weightUnit,\n        _type,\n        _key,\n      },\n      _type,\n      _key\n    }\n  }\n": GetWorkoutRecordQueryResult;

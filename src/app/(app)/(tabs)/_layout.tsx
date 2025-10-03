@@ -63,7 +63,7 @@ function Layout() {
           tabBarIcon: ({ color, size }) => (
             <Image
               source={{
-                uri: user?.imageUrl ?? user?.externalAccounts[0]?.imageUrl,
+                uri: user?.externalAccounts[0]?.imageUrl ?? user?.imageUrl,
               }}
               className="rounded-full"
               style={{ width: 28, height: 28, borderRadius: 100 }}
