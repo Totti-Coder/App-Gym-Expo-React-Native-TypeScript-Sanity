@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "deploy": "npx expo export -p web && npx eas-cli@latest deploy",
-    "vercel-build": "npx expo export -p web" 
+    "vercel-build": "npx expo export -p web"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^2.14.29",
@@ -40,7 +40,8 @@
     "react-timer-hook": "^4.0.5",
     "rxjs": "^7.8.1",
     "tailwindcss": "^3.4.0",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.8",
+    "expo-updates": "~0.28.17"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

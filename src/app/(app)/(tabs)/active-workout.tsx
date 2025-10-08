@@ -474,9 +474,11 @@ export default function ActiveWorkout() {
                               Repeticiones
                             </Text>
                             <TextInput
+                              // Valor actual: usa el valor de 'reps' del objeto 'set'
                               value={set.reps}
+                              // Función que se ejecuta cuando el texto cambia
                               onChangeText={(value) => {
-                                // Solo permite dígitos enteros (0-9).
+                                // ✅ Filtro JS: Solo permite dígitos enteros (0-9).
                                 const filteredValue = value.replace(
                                   /[^0-9]/g,
                                   ""
@@ -486,54 +488,65 @@ export default function ActiveWorkout() {
                                 updateSet(
                                   exercise.id,
                                   set.id,
-                                  "reps",
-                                  filteredValue
+                                  "reps", // Campo a actualizar
+                                  filteredValue // Nuevo valor
                                 );
                               }}
                               placeholder="0"
                               // Esto asegura que en el móvil aparezca el teclado numérico.
                               keyboardType="numeric"
+                              // Para navegadores web/modo moderno de input (si aplica)
+                              inputMode="numeric"
+                              // Estilos condicionales basados en si la serie está completada
                               className={`border rounded-lg px-3 py-2 text-center ${
                                 set.isCompleted
-                                  ? "bg-gray-200 border-gray-300 text-gray-500"
-                                  : "bg-white border-gray-300"
+                                  ? "bg-gray-200 border-gray-300 text-gray-500" // Estilo completado
+                                  : "bg-white border-gray-300 text-gray-800" // Estilo activo
                               }`}
-                              editable={!set.isCompleted}
-                            />
-                          </View>
-                          {/* Input del Peso */}
-                          <View className="flex-1 mx-2">
-                            <Text className="text-xs text-gray-600 mb-1">
-                              Peso ({weightUnit === "kg" ? "kg" : "lbs"})
-                            </Text>
-                            <TextInput
-                              value={set.weight}
-                              onChangeText={(value) => {
-                                // Solo permite dígitos (0-9) y un punto decimal (.)
-                                const filteredValue = value.replace(
-                                  /[^0-9.]/g,
-                                  ""
-                                );
-                                // Llama a la función de actualización con el valor filtrado.
-                                updateSet(
-                                  exercise.id,
-                                  set.id,
-                                  "weight",
-                                  filteredValue
-                                );
-                              }}
-                              placeholder="0"
-                              // Esto asegura que en el móvil aparezca el teclado numérico.
-                              keyboardType="numeric"
-                              className={`border rounded-lg px-3 py-2 text-center ${
-                                set.isCompleted
-                                  ? "bg-gray-200 border-gray-300 text-gray-500"
-                                  : "bg-white border-gray-300"
-                              }`}
+                              // Deshabilita la edición si la serie está completada
                               editable={!set.isCompleted}
                             />
                           </View>
 
+                          {/* Input del Peso (Weight) */}
+                          <View className="flex-1 mx-2">
+                            <Text className="text-xs text-gray-600 mb-1">
+                              Peso (kg)
+                            </Text>
+                            <TextInput
+                              // Valor actual: usa el valor de 'weight' del objeto 'set'
+                              value={set.weight}
+                              // Función que se ejecuta cuando el texto cambia
+                              onChangeText={(value) => {
+                                // ✅ Filtro JS: Permite dígitos (0-9) y un único punto (.).
+                                // Esto acepta números enteros o decimales.
+                                const filteredValue = value
+                                  .replace(/[^0-9.]/g, "")
+                                  .replace(/(\..*)\./g, "$1");
+
+                                // Llama a la función de actualización con el valor filtrado.
+                                updateSet(
+                                  exercise.id,
+                                  set.id,
+                                  "weight", // Campo a actualizar
+                                  filteredValue // Nuevo valor
+                                );
+                              }}
+                              placeholder="0.0"
+                              // Esto asegura que en el móvil aparezca el teclado numérico/decimal.
+                              keyboardType="numeric"
+                              // Para navegadores web/modo moderno de input (si aplica)
+                              inputMode="decimal"
+                              // Estilos condicionales basados en si la serie está completada
+                              className={`border rounded-lg px-3 py-2 text-center ${
+                                set.isCompleted
+                                  ? "bg-gray-200 border-gray-300 text-gray-500" // Estilo completado
+                                  : "bg-white border-gray-300 text-gray-800" // Estilo activo
+                              }`}
+                              // Deshabilita la edición si la serie está completada
+                              editable={!set.isCompleted}
+                            />
+                          </View>
                           {/* Boton de completado */}
                           <TouchableOpacity
                             onPress={() =>
