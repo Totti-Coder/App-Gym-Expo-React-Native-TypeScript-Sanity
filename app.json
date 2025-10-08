@@ -4,7 +4,7 @@
     "userInterfaceStyle": "automatic",
     "orientation": "default",
     "web": {
-      "output": "server" 
+      "output": "server"
     },
     "plugins": [
       [
@@ -15,6 +15,14 @@
       ]
     ],
     "name": "fit-app",
-    "slug": "fit-app"
+    "slug": "fit-app",
+    "extra": {
+      "router": {
+        "origin": "http://localhost:8081"
+      },
+      "eas": {
+        "projectId": "a60a06b7-19e2-4b20-907d-c38483bd601d"
+      }
+    }
   }
 }
