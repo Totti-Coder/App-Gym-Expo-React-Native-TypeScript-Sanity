@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   ScrollView,
   Text,
+  Touchable,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -49,6 +50,7 @@ export default function HomePage() {
 
   // Calculo de estadisticas (Se mantiene sin cambios)
   const totalWorkouts = workouts.length;
+  const lastWorkout = workouts[0];
   const totalDuration = workouts.reduce(
     (sum, workout) => sum + (workout.durationInSeconds || 0),
     0
@@ -143,6 +145,127 @@ export default function HomePage() {
             </View>
           </View>
         </View>
+        {/*Acciones Rapidas*/}
+        <View className="px-5 mb-5">
+          <Text className="text-lg font-semibold text-gray-900 mb-4">
+            Acciones Rapidas
+          </Text>
+          {/* Boton de comenzar el entrenamiento */}
+          <TouchableOpacity
+            onPress={() => router.push("/workout")}
+            className="bg-blue-500 rounded-2xl p-5 mb-4 shadow-sm"
+            activeOpacity={0.8}
+          >
+            <View className="flex-row items-center justify-between">
+              <View className="flex-row items-center flex-1">
+                <View className="w-10 h-10 bg-blue-400 rounded-full items-center justify-center mr-4">
+                  <Ionicons name="play" size={20} color="white" />
+                </View>
+                <View>
+                  <Text className="text-white text-xl font-semibold">
+                    Comenzar entreno
+                  </Text>
+                  <Text className="text-blue-100">
+                    Empieza tu sesion de entrenamiento
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="white" />
+            </View>
+          </TouchableOpacity>
+          {/* Posibles Acciones */}
+          <View className="flex-row gap-4">
+            <TouchableOpacity
+              onPress={() => router.push("/history")}
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex-1"
+              activeOpacity={0.7}
+            >
+              <View className="items-center">
+                <View className="w-12 h-12 bg-gray-100 rounded-full items-center justify-center mb-3">
+                  <Ionicons name="time-outline" size={24} color="#6B7280" />
+                </View>
+                <Text className="text-gray-900 font-medium text-center">
+                  Historial
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => router.push("/exercises")}
+              className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex-1"
+              activeOpacity={0.7}
+            >
+              <View className="items-center">
+                <View className="w-12 h-12 bg-gray-100 rounded-full items-center justify-center mb-3">
+                  <Ionicons name="barbell-outline" size={24} color="#6B7280" />
+                </View>
+                <Text className="text-gray-900 font-medium text-center">
+                  Ejercicios
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+        {/* Carta del ultimo entrenamiento */}
+        {lastWorkout && (
+          <View className="px-6 mb-8">
+            <Text className="text-lg font-semibold text-gray-900 mb-4">
+              Ultimo Entrenamiento
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                router.push({
+                  pathname: "/history/workout-record",
+                  params: { workoutId: lastWorkout._id },
+                });
+              }}
+              className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100"
+              activeOpacity={0.8}
+            >
+              <View className="flex-row items-center justify-between mb-4">
+                <View>
+                  <Text className="text-lg font-semibold text-gray-900">
+                    {formatDate(lastWorkout.date || "")}
+                  </Text>
+                  <View className="flex-row items-center mt-1">
+                    <Ionicons name="time-outline" size={15} color="#6B7280" />
+                    <Text className="text-gray-600 ml-2">
+                      {lastWorkout.durationInSeconds
+                        ? formatDuration(lastWorkout.durationInSeconds)
+                        : "La duracion no ha sido recogida"}
+                    </Text>
+                  </View>
+                </View>
+                <View className="bg-blue-100 rounded-full w-10 h-10 items-center justify-center">
+                  <Ionicons name="fitness-outline" size={20} color="#3B82F6"/>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
+        {/* En caso de que no haya entrenamientos */}
+        {totalWorkouts === 0 && (
+          <View className="px-5 mb-7">
+            <View className="bg-white rounded-2xl p-8 items-center shadow-sm border border-gray-100">
+              <View className="w-14 h-14 bg-blue-100 rounded-full items-center justify-center mb-4">
+                <Ionicons name="barbell-outline" size={30} color="#3B82F6"/>
+              </View>
+              <Text className="text-xl font-semibold text-gray-900 mb-2">
+                Preparado para comenzar en el gimnasio?
+              </Text>
+              <Text className="text-gray-600 text-center mb-4">
+                Guarda tus entrenamientos y comprueba tu progreso!
+              </Text>
+              <TouchableOpacity
+              onPress={() => router.push("/workout")}
+              className="bg-blue-600 rounded-xl px-6 py-3"
+              activeOpacity={0.7}>
+                <Text className="text-white font-semibold">
+                  Empieza tu primer entrenamiento
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
