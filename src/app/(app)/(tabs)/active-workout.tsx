@@ -22,14 +22,14 @@ import { defineQuery } from "groq";
 import { useUser } from "@clerk/clerk-expo";
 import { WorkoutData } from "@/app/api/save-workout+api";
 
-
-const findExerciseQuery = defineQuery(`*[_type == "Ejercicio" && _id == $id][0] {
+const findExerciseQuery =
+  defineQuery(`*[_type == "Ejercicio" && _id == $id][0] {
   _id,
   nombre
 }`);
 
 export default function ActiveWorkout() {
-  const {user} = useUser()
+  const { user } = useUser();
   const [showExerciseSelection, setShowExerciseSelection] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const {
@@ -139,19 +139,18 @@ export default function ActiveWorkout() {
         userId: user.id,
         date: new Date().toISOString(),
         durationInSeconds: durationInSeconds,
-        exercises: validExercises
-      }
+        exercises: validExercises,
+      };
 
       // Hacemos una llamada al servidor de Sanity
-      const result = await fetch("/api/save-workout",{
+      const result = await fetch("/api/save-workout", {
         method: "POST",
-        headers: { 
-        "Content-Type": "application/json",
-    },
-        body: JSON.stringify({workoutData})
-      })
-      console.log("Se ha guardado el entrenamiento:", result)
-
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ workoutData }),
+      });
+      console.log("Se ha guardado el entrenamiento:", result);
     } catch (error) {
       console.error("Error guardando el entrenamiento:", error);
       Alert.alert("Guardado fallido", "Vuelve a intentarlo de nuevo");
@@ -170,7 +169,7 @@ export default function ActiveWorkout() {
       );
       if (confirmed) {
         endWorkout();
-        router.replace("/(app)/(tabs)/history?refresh=true")
+        router.replace("/(app)/(tabs)/history?refresh=true");
       }
     } else {
       // Para Android
@@ -476,10 +475,23 @@ export default function ActiveWorkout() {
                             </Text>
                             <TextInput
                               value={set.reps}
-                              onChangeText={(value) =>
-                                updateSet(exercise.id, set.id, "reps", value)
-                              }
+                              onChangeText={(value) => {
+                                // Solo permite dígitos enteros (0-9).
+                                const filteredValue = value.replace(
+                                  /[^0-9]/g,
+                                  ""
+                                );
+
+                                // Llama a la función de actualización con el valor filtrado.
+                                updateSet(
+                                  exercise.id,
+                                  set.id,
+                                  "reps",
+                                  filteredValue
+                                );
+                              }}
                               placeholder="0"
+                              // Esto asegura que en el móvil aparezca el teclado numérico.
                               keyboardType="numeric"
                               className={`border rounded-lg px-3 py-2 text-center ${
                                 set.isCompleted
@@ -496,10 +508,22 @@ export default function ActiveWorkout() {
                             </Text>
                             <TextInput
                               value={set.weight}
-                              onChangeText={(value) =>
-                                updateSet(exercise.id, set.id, "weight", value)
-                              }
+                              onChangeText={(value) => {
+                                // Solo permite dígitos (0-9) y un punto decimal (.)
+                                const filteredValue = value.replace(
+                                  /[^0-9.]/g,
+                                  ""
+                                );
+                                // Llama a la función de actualización con el valor filtrado.
+                                updateSet(
+                                  exercise.id,
+                                  set.id,
+                                  "weight",
+                                  filteredValue
+                                );
+                              }}
                               placeholder="0"
+                              // Esto asegura que en el móvil aparezca el teclado numérico.
                               keyboardType="numeric"
                               className={`border rounded-lg px-3 py-2 text-center ${
                                 set.isCompleted
