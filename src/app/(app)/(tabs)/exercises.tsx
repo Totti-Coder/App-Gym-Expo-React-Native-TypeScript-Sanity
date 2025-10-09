@@ -51,9 +51,9 @@ export default function Exercises() {
       // Ahora con la query completa
       const exercises = await client.fetch(exercisesQuery)
       
-      
-      setExercises(exercises)
-      setFilteredExercises(exercises)
+      const typedExercises = exercises as unknown as Ejercicio[]
+      setExercises(typedExercises)
+      setFilteredExercises(typedExercises)
     } catch(error) {
       console.error("❌ Error al hacer fetching a los ejercicios:", error)
       setError(error.message || 'Error desconocido')
