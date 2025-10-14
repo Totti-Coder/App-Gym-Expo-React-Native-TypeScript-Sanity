@@ -40,11 +40,13 @@ export default function ExerciseSelectionModal({
       const exercises = await client.fetch(exercisesQuery);
       const typedExercises = exercises as unknown as Ejercicio[];
       setExercises(typedExercises);
-      setFilteredExercises(typedExercises);
+      // Inicialmente, la lista filtrada es la lista completa
+      setFilteredExercises(typedExercises); 
     } catch (error) {
       console.error("Error cargando los ejercicios:", error);
     }
   };
+  
   // Cargar ejercicios cuando el modal se abre
   useEffect(() => {
     if (visible) {
@@ -58,34 +60,39 @@ export default function ExerciseSelectionModal({
       // Si la búsqueda está vacía, muestra la lista completa
       setFilteredExercises(exercises);
     } else {
-      // Filtra por nombre y descripción
+      // Filtra por nombre, descripción y dificultad
       const filtered = exercises.filter(
         (exercise) =>
           exercise.nombre?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           exercise.descripcion
             ?.toLowerCase()
+            .includes(searchQuery.toLowerCase()) ||
+          exercise.dificultad 
+            ?.toLowerCase()
             .includes(searchQuery.toLowerCase())
       );
       setFilteredExercises(filtered);
     }
-  }, [searchQuery, exercises]);
+  }, [searchQuery, exercises]); // Dependencias: searchQuery y exercises
 
-  //Funcion para seleccionar el ejercicio
+  // Funcion para seleccionar el ejercicio
   const handleExercisePress = (exercise: Ejercicio) => {
     addExerciseToWorkout({ name: exercise.nombre, sanityId: exercise._id });
     onClose();
   };
+  
   // Funcion de Refresh
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchExercises();
     setRefreshing(false);
   };
+  
   return (
     <Modal
       visible={visible}
       animationType="slide"
-      presentationStyle="pageSheet" // Solo iOs y abajo para web(ESC) y para android
+      presentationStyle="pageSheet" 
       onRequestClose={onClose}
     >
       <SafeAreaView className="flex-1 bg-white">
