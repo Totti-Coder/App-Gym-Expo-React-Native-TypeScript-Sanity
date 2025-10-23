@@ -6,20 +6,20 @@ Una aplicación móvil completa y moderna diseñada para ayudarte a registrar, s
 
 ---
 
-## 🚀 Características Principales
+## ✨ Características Principales
 
 App-Gym ofrece una experiencia de usuario fluida y funcionalidades esenciales para cualquier entusiasta del fitness:
 
-* **Registro Detallado:** Rastrea tus series, repeticiones y peso de cada ejercicio.
-* **Gestión de Rutinas:** Crea, edita y organiza tus programas de entrenamiento personalizados.
-* **Autenticación Segura:** Utiliza **Clerk** para un manejo de usuarios robusto, seguro y escalable.
-* **Contenido Dinámico:** La información de ejercicios y datos clave se gestiona a través de **Sanity.io** (Headless CMS).
-* **Diseño Moderno:** Interfaz de usuario limpia y responsiva con **NativeWind (Tailwind CSS)**.
-* **Rendimiento Nativo:** Desarrollado con **Expo** y **React Native** para una experiencia multiplataforma optimizada.
+* **📝 Registro Detallado:** Rastrea tus series, repeticiones y peso de cada ejercicio.
+* **🗓️ Gestión de Rutinas:** Crea, edita y organiza tus programas de entrenamiento personalizados.
+* **🔒 Autenticación Segura:** Utiliza **Clerk** para un manejo de usuarios robusto, seguro y escalable.
+* **🗃️ Contenido Dinámico:** La información de ejercicios y datos clave se gestiona a través de **Sanity.io** (Headless CMS).
+* **🎨 Diseño Moderno:** Interfaz de usuario limpia y responsiva con **NativeWind (Tailwind CSS)**.
+* **📱 Rendimiento Nativo:** Desarrollado con **Expo** y **React Native** para una experiencia multiplataforma optimizada.
 
 ---
 
-## 🛠️ Stack Tecnológico Empleado
+## 🛠️ Stack Tecnológico
 
 | Componente | Tecnología | Propósito |
 | :--- | :--- | :--- |
@@ -36,7 +36,7 @@ App-Gym ofrece una experiencia de usuario fluida y funcionalidades esenciales pa
 
 Sigue estos pasos para poner en marcha el proyecto en tu máquina de desarrollo.
 
-### 1. Requisitos
+### 1. Requisitos Previos
 
 Asegúrate de tener instalados:
 
